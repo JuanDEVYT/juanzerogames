@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JuanZEROGames</title>
+  <link rel="stylesheet" href="styles.css">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Material+Symbols+Outlined:wght@400" rel="stylesheet">
+  <script type="importmap">
+    {
+      "imports": {
+        "@material/web/": "https://cdn.jsdelivr.net/npm/@material/web@1.2.0/"
+      }
+    }
+  </script>
+  <script type="module" src="script.js"></script>
+</head>
+<body>
+  <div id="app">
+    <!-- Splash inicial -->
+    <div id="splash" class="screen active">
+      <md-icon class="splash-icon">sports_esports</md-icon>
+      <h1>JuanZEROGames</h1>
+      <p>Tu tienda de juegos independiente</p>
+      <md-linear-progress indeterminate></md-linear-progress>
+    </div>
+
+    <!-- Pantalla principal -->
+    <div id="home" class="screen">
+      <header class="top-bar">
+        <h1>JuanZERO</h1>
+        <div style="flex:1"></div>
+        <md-icon-button id="favoritesBtn"><md-icon>favorite</md-icon></md-icon-button>
+        <md-icon-button id="devicesBtn"><md-icon>devices</md-icon></md-icon-button>
+        <md-icon-button id="accountBtn"><md-icon>account_circle</md-icon></md-icon-button>
+      </header>
+
+      <div class="search-bar">
+        <md-outlined-text-field placeholder="Buscar juegos..." id="searchInput" type="text" icon="search">
+          <md-icon slot="leading-icon">search</md-icon>
+        </md-outlined-text-field>
+      </div>
+
+      <div class="genre-chips" id="genreChips">
+        <md-chip-set>
+          <md-filter-chip selected label="Todos" data-genre="all"></md-filter-chip>
+        </md-chip-set>
+      </div>
+
+      <main class="game-grid" id="gameGrid"></main>
+
+      <footer class="bottom-nav">
+        <md-icon-button id="homeNav"><md-icon>home</md-icon></md-icon-button>
+        <md-icon-button id="favoritesNav"><md-icon>favorite_border</md-icon></md-icon-button>
+        <md-icon-button id="devicesNav"><md-icon>devices</md-icon></md-icon-button>
+      </footer>
+    </div>
+
+    <!-- Detalle del juego -->
+    <div id="detail" class="screen">
+      <header class="top-bar">
+        <md-icon-button id="backFromDetail"><md-icon>arrow_back</md-icon></md-icon-button>
+        <h2 id="detailTitle"></h2>
+      </header>
+      <div class="detail-content" id="detailContent"></div>
+    </div>
+
+    <!-- Login / Registro -->
+    <div id="login" class="screen">
+      <header class="top-bar">
+        <md-icon-button id="backFromLogin"><md-icon>arrow_back</md-icon></md-icon-button>
+        <h2>Cuenta</h2>
+      </header>
+      <div class="login-form">
+        <md-tabs>
+          <md-primary-tab id="loginTab" active>Iniciar sesión</md-primary-tab>
+          <md-primary-tab id="registerTab">Registrarse</md-primary-tab>
+        </md-tabs>
+        <md-outlined-text-field id="email" label="Email" type="email"></md-outlined-text-field>
+        <md-outlined-text-field id="password" label="Contraseña" type="password"></md-outlined-text-field>
+        <md-filled-button id="authBtn" style="width:100%">Entrar</md-filled-button>
+        <p id="authMessage" style="color: #ff6b6b; text-align:center;"></p>
+      </div>
+    </div>
+
+    <!-- Favoritos -->
+    <div id="favoritesScreen" class="screen">
+      <header class="top-bar">
+        <md-icon-button id="backFromFav"><md-icon>arrow_back</md-icon></md-icon-button>
+        <h2>Mis favoritos</h2>
+      </header>
+      <div class="game-grid" id="favGrid"></div>
+    </div>
+
+    <!-- Dispositivos -->
+    <div id="devicesScreen" class="screen">
+      <header class="top-bar">
+        <md-icon-button id="backFromDevices"><md-icon>arrow_back</md-icon></md-icon-button>
+        <h2>Mis dispositivos</h2>
+      </header>
+      <div id="deviceList"></div>
+    </div>
+  </div>
+
+  <!-- Diálogos globales (Material) -->
+  <md-dialog id="deviceNameDialog">
+    <div slot="headline">Nombre del dispositivo</div>
+    <form slot="content" id="deviceNameForm" method="dialog">
+      <md-outlined-text-field id="deviceNameInput" label="Nombre"></md-outlined-text-field>
+    </form>
+    <div slot="actions">
+      <md-text-button form="deviceNameForm" value="cancel">Cancelar</md-text-button>
+      <md-text-button form="deviceNameForm" value="save">Guardar</md-text-button>
+    </div>
+  </md-dialog>
+</body>
+</html>
