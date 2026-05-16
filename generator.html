@@ -10,7 +10,7 @@
     h1 { margin-bottom: 20px; color: #bb86fc; }
     .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
     label { font-weight: bold; display: block; margin-bottom: 4px; color: #bb86fc; }
-    input, textarea, select { width: 100%; padding: 8px; border: 1px solid #444; border-radius: 8px; background: #2c2f33; color: white; }
+    input, textarea { width: 100%; padding: 8px; border: 1px solid #444; border-radius: 8px; background: #2c2f33; color: white; }
     button { background: #bb86fc; color: #1a1c1e; border: none; padding: 10px 20px; border-radius: 20px; cursor: pointer; font-weight: bold; margin-right: 8px; }
     .game-list { list-style: none; }
     .game-item { background: #2c2f33; padding: 15px; margin-bottom: 10px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; }
@@ -31,7 +31,7 @@
 
   <div class="form-grid">
     <div><label>Título</label><input type="text" id="title" placeholder="Nombre del juego"></div>
-    <div><label>Género</label><select id="genre"><option>Aventura</option><option>Acción</option><option>RPG</option><option>Estrategia</option><option>Carreras</option><option>Roguelike</option></select></div>
+    <div><label>Género</label><input type="text" id="genre" placeholder="Ej: Acción, RPG, Carreras..."></div>
     <div><label>Descripción</label><textarea id="desc" rows="2"></textarea></div>
     <div><label>Desarrollador</label><input type="text" id="dev" placeholder="Estudio"></div>
     <div><label>Icono URL</label><input type="url" id="icon" placeholder="https://..."></div>
@@ -67,18 +67,19 @@
 
     function addGame() {
       const title = document.getElementById('title').value.trim();
-      const genre = document.getElementById('genre').value;
+      const genre = document.getElementById('genre').value.trim();
       const description = document.getElementById('desc').value.trim();
       const developer = document.getElementById('dev').value.trim();
       const iconUrl = document.getElementById('icon').value.trim();
       const apkLink = document.getElementById('apk').value.trim();
       const screenshots = document.getElementById('screenshots').value.split(',').map(s=>s.trim()).filter(s=>s);
+      
       if (!title || !apkLink) return alert('Título y APK obligatorios');
       
       const game = {
         id: editId || Date.now(),
         title,
-        genre,
+        genre: genre || 'Sin género',
         description,
         developer,
         iconUrl,
@@ -117,8 +118,7 @@
     }
 
     function clearForm() {
-      ['title','desc','dev','icon','apk','screenshots'].forEach(id=> document.getElementById(id).value='');
-      document.getElementById('genre').value = 'Aventura';
+      ['title','genre','desc','dev','icon','apk','screenshots'].forEach(id=> document.getElementById(id).value='');
       editId = null;
     }
 
@@ -148,7 +148,6 @@
         try {
           const data = JSON.parse(e.target.result);
           if (!Array.isArray(data)) throw new Error('El JSON no es un array');
-          // Validación simple: cada objeto debe tener al menos title y apkLink
           for (let item of data) {
             if (!item.title || !item.apkLink) throw new Error('Elementos sin título o apkLink');
           }
@@ -160,7 +159,6 @@
         }
       };
       reader.readAsText(file);
-      // Limpiar el input para que se pueda cargar el mismo archivo otra vez
       event.target.value = '';
     }
 
