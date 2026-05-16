@@ -1,7 +1,7 @@
 import 'https://cdn.jsdelivr.net/npm/@material/web@1.2.0/all.js';
 
 // Configuración (reemplaza con tus URLs reales)
-const GAMES_JSON_URL = 'https://raw.githubusercontent.com/TU-USUARIO/TU-REPO/main/games.json';
+const GAMES_JSON_URL = 'https://raw.githubusercontent.com/JuanDEVYT/juanzerogames/refs/heads/main/games.json';
 const API_URL = 'https://juanzerogames.pythonanywhere.com'; // sin barra final
 
 // Variables globales
