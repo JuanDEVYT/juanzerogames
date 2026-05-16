@@ -107,7 +107,7 @@ function showScreen(id) {
   document.getElementById(id).classList.add('active');
 }
 
-// Renderizado de juegos
+// Renderizado de juegos (tarjetas mejoradas)
 function renderGames(filterGenre = 'all', searchTerm = '') {
   const grid = document.getElementById('gameGrid');
   const filtered = games.filter(g =>
@@ -116,16 +116,20 @@ function renderGames(filterGenre = 'all', searchTerm = '') {
   );
   grid.innerHTML = filtered.map(g => {
     const isFav = favorites.has(g.id);
-    return '<div class="game-card" data-id="' + g.id + '">' +
-      '<img src="' + (g.iconUrl || 'https://via.placeholder.com/200') + '" alt="' + g.title + '">' +
-      '<div class="card-body">' +
-        '<h3>' + g.title + '</h3>' +
-        '<md-chip>' + g.genre + '</md-chip>' +
-        '<md-icon-button class="fav-btn" data-id="' + g.id + '">' +
-          '<md-icon style="color:' + (isFav ? '#bb86fc' : 'inherit') + '">' + (isFav ? 'favorite' : 'favorite_border') + '</md-icon>' +
-        '</md-icon-button>' +
-      '</div>' +
-    '</div>';
+    return `
+      <div class="game-card" data-id="${g.id}">
+        <img src="${g.iconUrl || 'https://via.placeholder.com/200'}" alt="${g.title}" loading="lazy">
+        <div class="card-body">
+          <h3>${g.title}</h3>
+          <div class="genre-row">
+            <md-chip>${g.genre}</md-chip>
+            <md-icon-button class="fav-btn" data-id="${g.id}">
+              <md-icon style="color:${isFav ? '#bb86fc' : '#aaa'}">${isFav ? 'favorite' : 'favorite_border'}</md-icon>
+            </md-icon-button>
+          </div>
+        </div>
+      </div>
+    `;
   }).join('');
 
   // Eventos
@@ -191,21 +195,21 @@ async function renderFavorites() {
   const favIds = await getFavorites();
   const favGames = games.filter(g => favIds.includes(g.id));
   const grid = document.getElementById('favGrid');
-  grid.innerHTML = favGames.map(g =>
-    '<div class="game-card" data-id="' + g.id + '">' +
-      '<img src="' + (g.iconUrl || 'https://via.placeholder.com/200') + '" alt="' + g.title + '">' +
-      '<div class="card-body">' +
-        '<h3>' + g.title + '</h3>' +
-        '<md-chip>' + g.genre + '</md-chip>' +
-      '</div>' +
-    '</div>'
-  ).join('');
+  grid.innerHTML = favGames.map(g => `
+    <div class="game-card" data-id="${g.id}">
+      <img src="${g.iconUrl || 'https://via.placeholder.com/200'}" alt="${g.title}">
+      <div class="card-body">
+        <h3>${g.title}</h3>
+        <md-chip>${g.genre}</md-chip>
+      </div>
+    </div>
+  `).join('');
   grid.querySelectorAll('.game-card').forEach(card => {
     card.addEventListener('click', () => showDetail(Number(card.dataset.id)));
   });
 }
 
-// Sincronización con la nube
+// Sincronización
 async function syncFavorites() {
   if (!userToken) return;
   const favs = await getFavorites();
@@ -241,7 +245,7 @@ async function loadSyncFromServer() {
   }
 }
 
-// Registro del Service Worker (sin backticks problemáticos)
+// Service Worker
 if ('serviceWorker' in navigator) {
   const swCode = [
     'const CACHE_NAME = "juanzero-v1";',
@@ -252,7 +256,6 @@ if ('serviceWorker' in navigator) {
     '  e.respondWith(caches.match(e.request).then(r => r || fetch(e.request)));',
     '});'
   ].join('\n');
-
   const blob = new Blob([swCode], { type: 'application/javascript' });
   const swUrl = URL.createObjectURL(blob);
   navigator.serviceWorker.register(swUrl).catch(err => console.warn('SW no registrado:', err));
@@ -343,25 +346,27 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   });
 
-  // Diálogo nombre dispositivo
-  const dialog = document.getElementById('deviceNameDialog');
-  dialog.addEventListener('close', () => {
+  // Modal de nombre de dispositivo (centrado y funcional)
+  const deviceDialog = document.getElementById('deviceNameDialog');
+  deviceDialog.addEventListener('close', () => {
     const form = document.getElementById('deviceNameForm');
     if (form.returnValue === 'save') {
       const newName = document.getElementById('deviceNameInput').value.trim();
       if (newName) {
         localStorage.setItem('deviceName', newName);
-        alert('Nombre actualizado');
+        // Sincronizar con la nube
+        if (userToken) {
+          apiCall('/api/devices/name', 'POST', { deviceId, name: newName }).catch(console.error);
+        }
+        showDevices(); // refrescar lista
       }
     }
-  });
-  document.getElementById('devicesScreen').addEventListener('click', e => {
-    if (e.target.id === 'editNameBtn') dialog.show();
   });
 
   renderGames();
 });
 
+// Pantalla de dispositivos (con delegación de eventos para botón editar)
 async function showDevices() {
   showScreen('devicesScreen');
   const list = document.getElementById('deviceList');
@@ -377,24 +382,32 @@ async function showDevices() {
       const isCurrent = (id === deviceId);
       const entry = document.createElement('div');
       entry.className = 'device-entry';
-      entry.innerHTML =
-        '<div style="display:flex; justify-content:space-between; align-items:center;">' +
-          '<h3>' + (isCurrent ? 'Este dispositivo' : (info.name || 'Sin nombre')) + '</h3>' +
-          (isCurrent ? '<md-text-button id="editNameBtn">Editar nombre</md-text-button>' : '') +
-        '</div>' +
-        '<p>' + (info.deviceInfo || '') + (isCurrent ? ' (Actual)' : '') + '</p>' +
-        '<div class="downloads">' +
-          (info.downloads || []).map(d => {
+      entry.innerHTML = `
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <h3>${isCurrent ? 'Este dispositivo' : (info.name || 'Sin nombre')}</h3>
+          ${isCurrent ? '<md-text-button id="editDeviceNameBtn">Editar nombre</md-text-button>' : ''}
+        </div>
+        <p>${info.deviceInfo || ''} ${isCurrent ? '(Actual)' : ''}</p>
+        <div class="downloads">
+          ${(info.downloads || []).map(d => {
             const gameTitle = games.find(g => g.id === d.gameId)?.title || ('Juego ' + d.gameId);
-            return '<span class="dl-chip">' + gameTitle + '</span>';
-          }).join('') +
-        '</div>';
+            return `<span class="dl-chip">${gameTitle}</span>`;
+          }).join('')}
+        </div>
+      `;
       list.appendChild(entry);
     }
-    // Evento para editar nombre
-    document.getElementById('editNameBtn')?.addEventListener('click', () => {
-      document.getElementById('deviceNameDialog').show();
-    });
+
+    // Agregar evento al botón "Editar nombre" (si existe)
+    const editBtn = document.getElementById('editDeviceNameBtn');
+    if (editBtn) {
+      editBtn.addEventListener('click', () => {
+        const dialog = document.getElementById('deviceNameDialog');
+        // Rellenar con el nombre actual
+        document.getElementById('deviceNameInput').value = getDeviceName();
+        dialog.showModal(); // Usamos showModal para que aparezca centrado y con backdrop
+      });
+    }
   } catch (e) {
     list.innerHTML = '<p style="padding:16px">Error al cargar dispositivos.</p>';
   }

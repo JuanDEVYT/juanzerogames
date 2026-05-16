@@ -81,27 +81,31 @@ md-chip-set {
   gap: 8px;
 }
 
-/* Game grid */
+/* ===== TARJETAS DE JUEGOS MEJORADAS ===== */
 .game-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-  gap: 16px;
-  padding: 16px;
+  gap: 20px;
+  padding: 20px;
   flex: 1;
   overflow-y: auto;
 }
 
-/* Tarjeta de juego */
 .game-card {
   background: var(--md-sys-color-surface-variant);
-  border-radius: 16px;
+  border-radius: 20px;
   overflow: hidden;
   cursor: pointer;
-  transition: transform 0.2s;
+  transition: all 0.25s ease;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+  display: flex;
+  flex-direction: column;
 }
 
 .game-card:hover {
-  transform: scale(1.02);
+  transform: translateY(-6px);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.5);
+  background: #383b40;
 }
 
 .game-card img {
@@ -111,22 +115,42 @@ md-chip-set {
 }
 
 .game-card .card-body {
-  padding: 12px;
+  padding: 14px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
 .game-card h3 {
   font-size: 16px;
-  margin-bottom: 4px;
-  white-space: nowrap;
+  font-weight: 500;
+  line-height: 1.2;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
   overflow: hidden;
-  text-overflow: ellipsis;
+  margin-bottom: 4px;
+}
+
+.game-card .genre-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: auto;
 }
 
 .game-card md-chip {
-  --md-chip-container-height: 24px;
+  --md-chip-container-height: 26px;
+  --md-chip-label-text-size: 13px;
 }
 
-/* Detail */
+.game-card .fav-btn {
+  margin-left: 4px;
+  --md-icon-button-size: 32px;
+}
+
+/* Detalle */
 .detail-content {
   padding: 16px;
   overflow-y: auto;
@@ -169,12 +193,13 @@ md-chip-set {
   border-top: 1px solid var(--md-sys-color-outline);
 }
 
-/* Device list */
+/* ===== DISPOSITIVOS ===== */
 .device-entry {
   background: var(--md-sys-color-surface-variant);
   margin: 12px;
   padding: 16px;
-  border-radius: 16px;
+  border-radius: 20px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.25);
 }
 
 .device-entry .downloads {
@@ -190,4 +215,37 @@ md-chip-set {
   padding: 4px 12px;
   border-radius: 16px;
   font-size: 14px;
+}
+
+/* ===== MODAL CENTRADO ===== */
+md-dialog {
+  border-radius: 20px;
+  padding: 24px;
+  background: var(--md-sys-color-surface);
+  color: var(--md-sys-color-on-surface);
+  max-width: 360px;
+  width: 90%;
+  border: none;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.6);
+}
+
+/* Forzar centrado del diálogo nativo si no se usa showModal */
+md-dialog[open] {
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1000;
+}
+
+/* Fondo oscuro detrás del diálogo */
+dialog::backdrop {
+  background: rgba(0, 0, 0, 0.7);
+}
+
+/* Si usamos showModal, el navegador ya lo centra, pero reforzamos */
+md-dialog[open]::backdrop {
+  background: rgba(0, 0, 0, 0.7);
 }
